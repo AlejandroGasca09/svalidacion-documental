@@ -21,17 +21,15 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
 });
 
-// Ruta de prueba para saber que el backend está vivo
 app.get('/api/status', (req, res) => {
   res.json({ mensaje: 'Validacion de funcionamiento ' });
 });
 
-// Arrancar el servidor y probar la base de datos
 app.listen(PORT, async () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
   
   try {
-    // Intentar una consulta rápida a la Base de Datos
+
     const res = await pool.query('SELECT NOW()');
     console.log('Conexión exitosa a la base de datos');
   } catch (error) {
