@@ -44,15 +44,38 @@ export default function Principal() {
     handleFile(e.dataTransfer.files?.[0]);
   }, []);
 
-  const handleGenerarQr = () => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleGenerarQr = async () => {
     if (!file) {
       setError("Sube un documento primero");
       return;
     }
-    const token = crypto.randomUUID();
-    const link = `${window.location.origin}/v/${token}`;
-    setQrValue(link);
-    showToast("QR generado correctamente");
+    
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al subir el archivo");
+      }
+
+      const data = await response.json();
+      const link = `${window.location.origin}/v/${data.filename}`;
+      setQrValue(link);
+      showToast("QR generado correctamente");
+    } catch (err) {
+      setError("Error al procesar el documento");
+      console.error(err);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDownload = () => {
@@ -166,12 +189,12 @@ export default function Principal() {
         <button
           type="button"
           onClick={handleGenerarQr}
-          disabled={!file}
+          disabled={!file || isUploading}
           className="mt-10 group relative w-full sm:w-auto inline-flex items-center justify-between gap-8 bg-neutral-900 text-stone-50 px-8 py-4 text-xs tracking-[0.3em] uppercase
                      disabled:bg-neutral-300 disabled:cursor-not-allowed
                      hover:bg-neutral-700 transition-colors duration-200"
         >
-          <span>Generar código QR</span>
+          <span>{isUploading ? "Subiendo..." : "Generar código QR"}</span>
           <span className="transform group-hover:translate-x-1 transition-transform duration-200">→</span>
         </button>
 
