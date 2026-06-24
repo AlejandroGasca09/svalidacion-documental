@@ -169,6 +169,40 @@ app.get('/api/validar/:folio', async (req, res) => {
   }
 });
 
+app.get('/api/documentos', authenticateToken, async (req, res) => {
+  const usuario_id = req.user.id;
+  try {
+    const result = await pool.query(
+      'SELECT folio, titulo, tipo_documento, area_emisora, estado, fecha_registro FROM documentos WHERE usuario_id = $1 ORDER BY fecha_registro DESC',
+      [usuario_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error al obtener documentos:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.put('/api/documentos/:folio/revocar', authenticateToken, async (req, res) => {
+  const { folio } = req.params;
+  const usuario_id = req.user.id;
+  try {
+    const check = await pool.query('SELECT estado FROM documentos WHERE folio = $1 AND usuario_id = $2', [folio, usuario_id]);
+    if (check.rows.length === 0) {
+      return res.status(404).json({ error: 'Documento no encontrado o no autorizado' });
+    }
+    if (check.rows[0].estado === 'Revocado') {
+      return res.status(400).json({ error: 'El documento ya está revocado' });
+    }
+
+    await pool.query('UPDATE documentos SET estado = $1 WHERE folio = $2 AND usuario_id = $3', ['Revocado', folio, usuario_id]);
+    res.json({ mensaje: 'Documento revocado exitosamente' });
+  } catch (error) {
+    console.error('Error al revocar documento:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // Clave secreta para JWT (idealmente en variable de entorno)
 const JWT_SECRET = process.env.JWT_SECRET || 'clave_super_secreta_qr_123';
 

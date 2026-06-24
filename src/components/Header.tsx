@@ -1,4 +1,17 @@
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 function Header() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const isAuth = !!token;
+
+  const handleLogout = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login');
+  };
+
   return (
     <header className="bg-stone-50 border-b border-neutral-200">
       <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
@@ -33,6 +46,14 @@ function Header() {
           />
         </a>
       </div>
+
+      {isAuth && (
+          <div className="max-w-6xl mx-auto px-6 pb-4 flex gap-6 text-[10px] tracking-widest uppercase font-mono text-neutral-500">
+              <Link to="/" className={`hover:text-neutral-900 transition-colors ${location.pathname === '/' ? 'text-neutral-900 font-bold' : ''}`}>Nuevo Documento</Link>
+              <Link to="/dashboard" className={`hover:text-neutral-900 transition-colors ${location.pathname === '/dashboard' ? 'text-neutral-900 font-bold' : ''}`}>Mis Documentos</Link>
+              <button onClick={handleLogout} className="ml-auto hover:text-red-600 transition-colors">Cerrar Sesión</button>
+          </div>
+      )}
 
       {/* Línea acento sutil */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
