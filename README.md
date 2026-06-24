@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# Sistema de Validación Documental - FES Aragón
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Un sistema moderno para el registro, sellado y validación de documentos institucionales mediante códigos QR. Desarrollado para la FES Aragón (UNAM), esta plataforma permite a los administradores subir documentos PDF, incrustarles automáticamente un código QR de validación y ofrecer al público una ruta de verificación para comprobar la autenticidad y estado de cada documento.
 
-Currently, two official plugins are available:
+## Características Principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Autenticación Segura**: Acceso mediante JWT para usuarios administradores.
+- **Sellado Automático de PDF**: Incrustación de códigos QR en los documentos PDF en posiciones configurables.
+- **Validación Pública**: Enlaces públicos generados automáticamente para que cualquier persona pueda verificar la validez de un documento sin necesidad de iniciar sesión.
+- **Interfaz Moderna**: Diseño minimalista y responsivo construido con React y Tailwind CSS, brindando una experiencia de usuario premium.
 
-## React Compiler
+## Tecnologías Utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Frontend
+- React 18 (Vite)
+- Tailwind CSS
+- React Router DOM
+- qrcode.react
 
-## Expanding the ESLint configuration
+### Backend
+- Node.js & Express
+- PostgreSQL (Base de Datos)
+- pdf-lib (Manipulación de PDF)
+- Multer (Carga de archivos)
+- JSON Web Tokens (JWT) & bcrypt
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requisitos Previos
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Asegúrate de tener instalados los siguientes componentes en tu sistema antes de comenzar:
+- [Node.js](https://nodejs.org/) (versión 16 o superior)
+- [Docker y Docker Compose](https://www.docker.com/) (para levantar la base de datos fácilmente)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Instalación y Configuración
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Clonar el repositorio y acceder a la carpeta:**
+   ```bash
+   git clone <url-del-repositorio>
+   cd svalidacion-documental
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. **Instalar dependencias del proyecto:**
+   ```bash
+   npm install
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. **Configurar la Base de Datos:**
+   El proyecto incluye un archivo `docker-compose.yml` para desplegar la base de datos PostgreSQL rápidamente.
+   ```bash
+   docker-compose up -d
+   ```
+   *Nota: La base de datos correrá en el puerto `5433` con el usuario `usuario_qr`.*
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+4. **Variables de Entorno (`.env`):**
+   Asegúrate de configurar el archivo `.env` en la raíz del proyecto basándote en la conexión de tu base de datos y la configuración del puerto.
+
+5. **Iniciar el Servidor de Desarrollo (Frontend + Backend):**
+   ```bash
+   npm run dev
+   ```
+
+## Uso del Sistema
+
+### Administradores
+1. Acceder a `/login`.
+2. Ingresar las credenciales configuradas en el archivo `init.sql` (Ej. `admin@sistema.com`).
+3. En la página principal, completar los datos del documento (Título, Tipo, Área Emisora, Posición del QR) y adjuntar el archivo PDF.
+4. Hacer clic en "Generar y Sellar Documento".
+5. Se generará un enlace público de validación y el documento sellado quedará almacenado en el sistema.
+
+### Validadores Públicos
+1. Escanear el código QR del documento impreso o acceder directamente al enlace público generado.
+2. El sistema mostrará si el documento se encuentra "Vigente", junto con los metadatos y un visor del archivo original.

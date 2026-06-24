@@ -50,9 +50,6 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
 });
 
-app.get('/api/status', (req, res) => {
-  res.json({ mensaje: 'Validacion de funcionamiento ' });
-});
 
 // Middleware de autenticación opcional o requerido para upload
 const authenticateToken = (req, res, next) => {
@@ -230,8 +227,7 @@ app.listen(PORT, async () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
   
   try {
-
-    const res = await pool.query('SELECT NOW()');
+    await pool.query('SELECT NOW()');
     console.log('Conexión exitosa a la base de datos');
   } catch (error) {
     console.error(' Error al conectar con la base de datos:', error);
